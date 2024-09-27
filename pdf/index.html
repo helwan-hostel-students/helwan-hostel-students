@@ -159,13 +159,20 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     };
                 });
             }));
-
+			
             const pdf = new jsPDF('portrait', 'mm', 'a4');
             const imgWidth = 85.60; 
             const imgHeight = 53.98; 
             const margin = 10; 
             let x = (pdf.internal.pageSize.getWidth() - imgWidth * 2 - margin) / 2; 
             let y = margin;
+			
+			if (canvasArray.length >= 6) {
+    [canvasArray[0], canvasArray[1]] = [canvasArray[1], canvasArray[0]];
+    [canvasArray[2], canvasArray[3]] = [canvasArray[3], canvasArray[2]];
+    [canvasArray[4], canvasArray[5]] = [canvasArray[5], canvasArray[4]];
+}
+
 
             canvasArray.forEach((dataUrl, index) => {
                 pdf.addImage(dataUrl, 'JPEG', x, y, imgWidth, imgHeight);
