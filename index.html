@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الصفحة الرئيسية</title>
+    <style>
+        @font-face {
+            font-family: 'Lalezar';
+            src: url('../fonts/Lalezar.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            background: black;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;  
+            align-items: center;      
+            position: relative;       
+            font-family: 'Lalezar'; 
+            color: white; 
+        }
+
+        .meteor-shower {
+            position: absolute;       
+            width: 100%;
+            height: 100%;
+            top: 0;                  
+            left: 0;
+            z-index: 0;             
+        }
+
+        .meteor {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: white;
+            animation: fall linear infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        .meteor:nth-child(1) { left: 10%; animation-duration: 2s; animation-delay: 0s; }
+        .meteor:nth-child(2) { left: 30%; animation-duration: 1.5s; animation-delay: 0.5s; }
+        .meteor:nth-child(3) { left: 50%; animation-duration: 3s; animation-delay: 1s; }
+        .meteor:nth-child(4) { left: 70%; animation-duration: 2.5s; animation-delay: 1.5s; }
+        .meteor:nth-child(5) { left: 90%; animation-duration: 1.8s; animation-delay: 2s; }
+
+        .button {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #00FFFF, #FF00FF);
+            color: white;
+            border: none;            
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px; 
+            text-decoration: none; 
+            display: inline-block; 
+            z-index: 1;          
+            animation: gradient-animation 2s linear infinite; 
+            background-size: 200% 200%; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); 
+        }
+
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .button-container {
+            display: flex;              
+            flex-direction: column;     
+            align-items: center;        
+            z-index: 1;                
+            position: relative;         
+        }
+
+        @media (max-width: 600px) {
+            .button {
+                font-size: 14px; 
+                padding: 8px 16px; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="meteor-shower">
+        <div class="meteor"></div>
+        <div class="meteor"></div>
+        <div class="meteor"></div>
+        <div class="meteor"></div>
+        <div class="meteor"></div>
+    </div>
+    <div class="button-container">
+        <a href="/faq" target="_blank" class="button" aria-label="FAQ">الأسئلة الشائعة</a>
+        <a href="/pdf" target="_blank" class="button" aria-label="Card Images">ضبط صور البطاقات</a>
+    </div>
+</body>
+</html>
