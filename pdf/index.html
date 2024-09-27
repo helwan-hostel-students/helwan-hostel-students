@@ -70,28 +70,30 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     </style>
 </head>
 <body>
-    
     <div id="imageContainer">
+		<center>
+		<h1 style="color:#ff0000; font-size: 30px;">نسخة تجريبية</h1></center>
         <label for="imageUploader1">صورة بطاقة الطالب</label>
         <input type="file" id="imageUploader1" class="uploader" data-card-name="بطاقة الطالب" accept="image/jpeg, image/png, image/jpg, image/heif">
-        
+
         <label for="imageUploader2">صورة ظهر بطاقة الطالب</label>
         <input type="file" id="imageUploader2" class="uploader" data-card-name="ظهر بطاقة الطالب" accept="image/jpeg, image/png, image/jpg, image/heif">
-        
+
         <label for="imageUploader3">صورة بطاقة ولي الأمر</label>
         <input type="file" id="imageUploader3" class="uploader" data-card-name="بطاقة ولي الأمر" accept="image/jpeg, image/png, image/jpg, image/heif">
-        
+
         <label for="imageUploader4">صورة ظهر بطاقة ولي الأمر</label>
         <input type="file" id="imageUploader4" class="uploader" data-card-name="ظهر بطاقة ولي الأمر" accept="image/jpeg, image/png, image/jpg, image/heif">
-        
+
         <label for="imageUploader5">صورة بطاقة الضامن</label>
         <input type="file" id="imageUploader5" class="uploader" data-card-name="بطاقة الضامن" accept="image/jpeg, image/png, image/jpg, image/heif">
-        
+
         <label for="imageUploader6">صورة ظهر بطاقة الضامن</label>
         <input type="file" id="imageUploader6" class="uploader" data-card-name="ظهر بطاقة الضامن" accept="image/jpeg, image/png, image/jpg, image/heif">
-		<div id="error"></div>
-		<div id="previewContainer"></div>
-		<button id="downloadPDF" class="button">حمل الـPDF.</button>
+
+        <div id="error"></div>
+        <div id="previewContainer"></div>
+        <button id="downloadPDF" class="button">حمل الـPDF</button>
     </div>
 
     <script>
@@ -101,15 +103,16 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
         document.getElementById('downloadPDF').onclick = async () => {
             canvasArray.length = 0; 
-            const imageElements = [];
             const errorContainer = document.getElementById('error');
             errorContainer.innerHTML = ''; 
 
             const uploaders = document.querySelectorAll('.uploader');
+            const orderedImages = Array(6).fill(null);
+
             for (let i = 0; i < uploaders.length; i++) {
                 const fileInput = uploaders[i];
                 if (fileInput.files.length === 0) {
-                    errorContainer.innerHTML = `خلي بالك: نسيت صورة${fileInput.getAttribute('data-card-name')} روح ارفعها.`;
+                    errorContainer.innerHTML = `خلي بالك: نسيت صورة ${fileInput.getAttribute('data-card-name')} روح ارفعها.`;
                     return; 
                 } else {
                     const file = fileInput.files[0];
@@ -119,75 +122,81 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
                     }
                     const img = new Image();
                     img.src = URL.createObjectURL(file);
-                    imageElements.push(img);
+
+                    await new Promise((resolve) => {
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            const targetWidth = 85.60; 
+                            const targetHeight = 53.98; 
+
+                            const dpi = 96;
+                            const widthPx = targetWidth * dpi / 25.4; 
+                            const heightPx = targetHeight * dpi / 25.4; 
+
+                            canvas.width = widthPx;
+                            canvas.height = heightPx;
+
+                            ctx.fillStyle = 'white';
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                            ctx.drawImage(img, 0, 0, widthPx, heightPx);
+
+                            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                            const data = imageData.data;
+
+                            for (let i = 0; i < data.length; i += 4) {
+                                const avg = (data[i] + data[i + 1] + data[i + 2]) / 3; 
+                                data[i] = avg;     
+                                data[i + 1] = avg; 
+                                data[i + 2] = avg; 
+                            }
+
+                            ctx.putImageData(imageData, 0, 0);
+                            canvasArray.push(canvas.toDataURL('image/jpeg'));
+                            resolve();
+                        };
+                    });
+
+                    orderedImages[i] = img.src;
                 }
             }
 
-            await Promise.all(imageElements.map(img => {
-                return new Promise((resolve) => {
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        const targetWidth = 85.60; 
-                        const targetHeight = 53.98; 
+            const finalCanvasArray = [
+                canvasArray[1],
+                canvasArray[0],
+                canvasArray[3],
+                canvasArray[2],
+                canvasArray[5],
+                canvasArray[4]
+            ];
 
-                        const dpi = 96;
-                        const widthPx = targetWidth * dpi / 25.4; 
-                        const heightPx = targetHeight * dpi / 25.4; 
-
-                        canvas.width = widthPx;
-                        canvas.height = heightPx;
-
-                        ctx.fillStyle = 'white';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                        ctx.drawImage(img, 0, 0, widthPx, heightPx);
-
-                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                        const data = imageData.data;
-
-                        for (let i = 0; i < data.length; i += 4) {
-                            const avg = (data[i] + data[i + 1] + data[i + 2]) / 3; 
-                            data[i] = avg;     
-                            data[i + 1] = avg; 
-                            data[i + 2] = avg; 
-                        }
-
-                        ctx.putImageData(imageData, 0, 0);
-                        canvasArray.push(canvas.toDataURL('image/jpeg'));
-                        resolve();
-                    };
-                });
-            }));
-			
             const pdf = new jsPDF('portrait', 'mm', 'a4');
             const imgWidth = 85.60; 
             const imgHeight = 53.98; 
             const margin = 10; 
             let x = (pdf.internal.pageSize.getWidth() - imgWidth * 2 - margin) / 2; 
             let y = margin;
-			
-			if (canvasArray.length >= 6) {
-    [canvasArray[0], canvasArray[1]] = [canvasArray[1], canvasArray[0]];
-    [canvasArray[2], canvasArray[3]] = [canvasArray[3], canvasArray[2]];
-    [canvasArray[4], canvasArray[5]] = [canvasArray[5], canvasArray[4]];
-}
 
-
-            canvasArray.forEach((dataUrl, index) => {
-                pdf.addImage(dataUrl, 'JPEG', x, y, imgWidth, imgHeight);
-                x += imgWidth + margin; 
-                if ((index + 1) % 2 === 0) {
-                    x = (pdf.internal.pageSize.getWidth() - imgWidth * 2 - margin) / 2; 
-                    y += imgHeight + margin; 
-                }
-                if (y + imgHeight > 297 - margin) {
-                    return; 
+            finalCanvasArray.forEach((dataUrl, index) => {
+                if (dataUrl) {
+                    pdf.addImage(dataUrl, 'JPEG', x, y, imgWidth, imgHeight);
+                    x += imgWidth + margin; 
+                    if ((index + 1) % 2 === 0) {
+                        x = (pdf.internal.pageSize.getWidth() - imgWidth * 2 - margin) / 2; 
+                        y += imgHeight + margin; 
+                    }
+                    if (y + imgHeight > 297 - margin) {
+                        return; 
+                    }
                 }
             });
 
-            pdf.save('id_cards.pdf');
+            pdf.save('id_cards.pdf'); 
         };
     </script>
 </body>
+
+</body>
+
 </html>
